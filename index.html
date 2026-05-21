@@ -1,802 +1,618 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>GrokScraper — AI Web Extraction</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/dist/tabler-icons.min.css" />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AI Web Scraper</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-:root {
-  --bg:      #08090c;
-  --s1:      #111318;
-  --s2:      #181c23;
-  --s3:      #1f242e;
-  --s4:      #262c38;
-  --bd:      rgba(255,255,255,0.07);
-  --bd2:     rgba(255,255,255,0.13);
-  --bd3:     rgba(255,255,255,0.22);
-  --tx:      #dde1ea;
-  --tx2:     #8892a4;
-  --tx3:     #4f5869;
-  --gr:      #00c896;
-  --gr2:     #00a37e;
-  --bl:      #3b8cf8;
-  --ye:      #f5a623;
-  --re:      #f55;
-  --mono:    'JetBrains Mono', monospace;
-  --sans:    'Space Grotesk', sans-serif;
-  --r:       8px;
-  --r2:      12px;
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --primary:#5b6cf9;
+  --primary-dark:#3d4fd4;
+  --secondary:#a855f7;
+  --bg:#0f1117;
+  --card:#1a1d2e;
+  --card2:#22263a;
+  --border:#2e3354;
+  --text:#e2e8f0;
+  --muted:#8892a4;
+  --green:#22c55e;
+  --red:#ef4444;
+  --yellow:#f59e0b;
+  --font:'Poppins',sans-serif;
+  --mono:'Source Code Pro',monospace;
 }
-html { font-size: 15px; }
-body { background: var(--bg); color: var(--tx); font-family: var(--sans); min-height: 100vh; display: flex; flex-direction: column; }
+body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;}
 
-/* ── TOPBAR ── */
-.topbar {
-  background: var(--s1);
-  border-bottom: 1px solid var(--bd);
-  padding: 0 24px;
-  height: 52px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  position: sticky;
-  top: 0;
-  z-index: 100;
+/* ── NAVBAR ── */
+nav{
+  background:rgba(26,29,46,0.95);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--border);
+  padding:0 24px;
+  height:60px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:999;
 }
-.logo {
-  display: flex; align-items: center; gap: 8px;
-  font-weight: 700; font-size: 15px; letter-spacing: -0.02em;
+.nav-brand{
+  font-size:20px;font-weight:800;
+  background:linear-gradient(135deg,var(--primary),var(--secondary));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  display:flex;align-items:center;gap:8px;
 }
-.logo-dot {
-  width: 8px; height: 8px; border-radius: 50%;
-  background: var(--gr);
-  box-shadow: 0 0 8px var(--gr);
-  animation: pulse 2s ease-in-out infinite;
+.nav-brand i{font-size:22px;background:linear-gradient(135deg,var(--primary),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.nav-links{display:flex;gap:6px;}
+.nav-link{
+  color:var(--muted);font-size:13px;font-weight:500;
+  padding:7px 14px;border-radius:8px;text-decoration:none;
+  transition:all .2s;display:flex;align-items:center;gap:6px;
 }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-.logo-text { color: var(--tx); }
-.logo-accent { color: var(--gr); }
-.topbar-sep { flex: 1; }
-.topbar-badge {
-  font-family: var(--mono);
-  font-size: 10px;
-  padding: 3px 9px;
-  border-radius: 4px;
-  border: 1px solid var(--bd2);
-  color: var(--tx2);
-  letter-spacing: 0.04em;
-}
-.topbar-links { display: flex; gap: 4px; }
-.topbar-link {
-  font-size: 12px; color: var(--tx2);
-  padding: 5px 10px; border-radius: var(--r);
-  text-decoration: none; transition: all .15s;
-  display: flex; align-items: center; gap: 5px;
-}
-.topbar-link:hover { background: var(--s3); color: var(--tx); }
-.topbar-link i { font-size: 15px; }
-
-/* ── LAYOUT ── */
-.app {
-  flex: 1;
-  display: grid;
-  grid-template-columns: 360px 1fr;
-  min-height: calc(100vh - 52px);
+.nav-link:hover{color:var(--text);background:var(--card2);}
+.nav-badge{
+  background:linear-gradient(135deg,var(--primary),var(--secondary));
+  color:white;font-size:11px;font-weight:600;
+  padding:4px 12px;border-radius:20px;
 }
 
-/* ── LEFT PANEL ── */
-.left-panel {
-  background: var(--s1);
-  border-right: 1px solid var(--bd);
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
+/* ── HERO ── */
+.hero{
+  text-align:center;
+  padding:60px 24px 40px;
+  background:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(91,108,249,0.15),transparent);
 }
-.panel-section {
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--bd);
+.hero-tag{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(91,108,249,0.12);border:1px solid rgba(91,108,249,0.3);
+  color:var(--primary);font-size:12px;font-weight:600;
+  padding:5px 14px;border-radius:20px;margin-bottom:20px;
+  letter-spacing:.04em;
 }
-.section-label {
-  font-family: var(--mono);
-  font-size: 10px;
-  color: var(--tx3);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  margin-bottom: 12px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
+.hero-tag i{font-size:11px;}
+.hero h1{
+  font-size:42px;font-weight:800;line-height:1.15;
+  margin-bottom:14px;
 }
-.section-label i { font-size: 13px; color: var(--tx2); }
+.hero h1 span{
+  background:linear-gradient(135deg,var(--primary),var(--secondary));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.hero p{color:var(--muted);font-size:15px;max-width:520px;margin:0 auto 28px;line-height:1.7;}
+.hero-pills{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+.pill{
+  background:var(--card);border:1px solid var(--border);
+  color:var(--muted);font-size:12px;font-weight:500;
+  padding:6px 14px;border-radius:20px;
+  display:flex;align-items:center;gap:6px;
+}
+.pill i{color:var(--primary);}
 
-/* Inputs */
-label { display: block; font-size: 12px; color: var(--tx2); margin-bottom: 5px; }
-input[type=text], input[type=url], input[type=password], textarea, select {
-  width: 100%;
-  background: var(--s2);
-  border: 1px solid var(--bd2);
-  border-radius: var(--r);
-  color: var(--tx);
-  font-family: var(--mono);
-  font-size: 12px;
-  padding: 8px 11px;
-  outline: none;
-  transition: border-color .15s;
-  resize: none;
-}
-input:focus, textarea:focus, select:focus { border-color: var(--gr); }
-select { cursor: pointer; }
-option { background: var(--s2); }
+/* ── MAIN LAYOUT ── */
+.container{max-width:1200px;margin:0 auto;padding:0 24px 60px;}
+.grid{display:grid;grid-template-columns:360px 1fr;gap:24px;align-items:start;}
 
-.input-group { display: flex; gap: 8px; align-items: flex-start; }
-.input-group input { flex: 1; }
-
-/* API key field */
-.apikey-wrap {
-  position: relative;
+/* ── CARDS ── */
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  overflow:hidden;
 }
-.apikey-wrap input { padding-right: 36px; }
-.apikey-toggle {
-  position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
-  background: none; border: none; color: var(--tx3); cursor: pointer;
-  font-size: 15px; padding: 2px;
-  transition: color .15s;
+.card-header{
+  padding:16px 20px;
+  background:var(--card2);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
 }
-.apikey-toggle:hover { color: var(--tx); }
+.card-header i{color:var(--primary);font-size:16px;}
+.card-header h3{font-size:14px;font-weight:600;color:var(--text);}
+.card-header span{font-size:12px;color:var(--muted);margin-left:auto;}
+.card-body{padding:20px;}
 
-/* Mode cards */
-.mode-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 7px;
+/* ── FORM ELEMENTS ── */
+.form-group{margin-bottom:16px;}
+.form-group label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px;letter-spacing:.04em;text-transform:uppercase;}
+input[type=text],input[type=url],input[type=password],textarea,select{
+  width:100%;background:var(--card2);border:1px solid var(--border);
+  border-radius:10px;color:var(--text);font-family:var(--mono);font-size:12px;
+  padding:9px 13px;outline:none;transition:border-color .2s,box-shadow .2s;resize:none;
 }
-.mode-card {
-  background: var(--s2);
-  border: 1px solid var(--bd2);
-  border-radius: var(--r);
-  padding: 10px;
-  cursor: pointer;
-  transition: all .15s;
+input:focus,textarea:focus,select:focus{
+  border-color:var(--primary);
+  box-shadow:0 0 0 3px rgba(91,108,249,0.15);
 }
-.mode-card:hover { background: var(--s3); }
-.mode-card.sel { border-color: var(--gr); background: rgba(0,200,150,.07); }
-.mode-icon { font-size: 18px; color: var(--gr); margin-bottom: 4px; }
-.mode-name { font-size: 12px; font-weight: 600; color: var(--tx); }
-.mode-desc { font-family: var(--mono); font-size: 10px; color: var(--tx3); margin-top: 2px; line-height: 1.4; }
+select{cursor:pointer;}
+option{background:var(--card2);}
 
-/* Schema */
-.schema-box {
-  background: var(--s2);
-  border: 1px solid var(--bd2);
-  border-radius: var(--r);
-  overflow: hidden;
+/* ── MODE BUTTONS ── */
+.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.mode-btn{
+  background:var(--card2);border:1px solid var(--border);
+  border-radius:10px;padding:12px;cursor:pointer;
+  transition:all .2s;text-align:left;
 }
-.schema-head {
-  padding: 8px 11px;
-  background: var(--s3);
-  border-bottom: 1px solid var(--bd);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.mode-btn:hover{border-color:var(--primary);background:rgba(91,108,249,0.08);}
+.mode-btn.active{border-color:var(--primary);background:rgba(91,108,249,0.12);}
+.mode-btn i{font-size:18px;color:var(--primary);display:block;margin-bottom:5px;}
+.mode-btn strong{font-size:12px;font-weight:600;color:var(--text);display:block;}
+.mode-btn small{font-size:10px;color:var(--muted);line-height:1.4;}
+
+/* ── SCHEMA ── */
+.schema-wrap{background:var(--card2);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+.schema-top{padding:8px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+.schema-top span{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.05em;}
+.btn-sm{
+  background:rgba(91,108,249,0.12);border:1px solid rgba(91,108,249,0.3);
+  color:var(--primary);font-size:11px;font-weight:600;font-family:var(--font);
+  padding:4px 10px;border-radius:6px;cursor:pointer;
+  display:flex;align-items:center;gap:4px;transition:background .2s;
 }
-.schema-head-title { font-family: var(--mono); font-size: 10px; color: var(--tx3); letter-spacing: .06em; }
-.btn-add {
-  background: rgba(0,200,150,.12);
-  border: 1px solid rgba(0,200,150,.25);
-  color: var(--gr);
-  font-family: var(--mono);
-  font-size: 10px;
-  padding: 3px 8px;
-  border-radius: 5px;
-  cursor: pointer;
-  display: flex; align-items: center; gap: 4px;
-  transition: background .15s;
+.btn-sm:hover{background:rgba(91,108,249,0.22);}
+.fields-list{padding:8px;display:flex;flex-direction:column;gap:5px;max-height:170px;overflow-y:auto;}
+.field-row{display:grid;grid-template-columns:1fr 80px 26px;gap:5px;}
+.field-row input,.field-row select{font-size:11px;padding:6px 8px;border-radius:7px;}
+.btn-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:2px;transition:color .15s;display:flex;align-items:center;justify-content:center;}
+.btn-del:hover{color:var(--red);}
+
+/* ── PRESETS ── */
+.presets{display:flex;flex-wrap:wrap;gap:6px;}
+.preset-btn{
+  background:var(--card2);border:1px solid var(--border);
+  color:var(--muted);font-size:11px;font-weight:500;font-family:var(--font);
+  padding:5px 12px;border-radius:20px;cursor:pointer;
+  transition:all .2s;
 }
-.btn-add:hover { background: rgba(0,200,150,.22); }
-.fields-list { padding: 8px; display: flex; flex-direction: column; gap: 5px; max-height: 180px; overflow-y: auto; }
-.field-row { display: grid; grid-template-columns: 1fr 78px 26px; gap: 5px; align-items: center; }
-.field-row input, .field-row select { font-size: 11px; padding: 5px 8px; border-radius: 5px; }
-.btn-del { background: none; border: none; color: var(--tx3); cursor: pointer; font-size: 14px; padding: 2px; display:flex; align-items:center; justify-content:center; transition: color .15s; }
-.btn-del:hover { color: var(--re); }
+.preset-btn:hover{color:var(--primary);border-color:rgba(91,108,249,0.4);background:rgba(91,108,249,0.07);}
 
-/* Presets */
-.presets { display: flex; flex-wrap: wrap; gap: 5px; }
-.preset {
-  font-family: var(--mono); font-size: 10px;
-  padding: 4px 10px; border-radius: 100px;
-  border: 1px solid var(--bd2);
-  color: var(--tx2); cursor: pointer;
-  background: var(--s2);
-  transition: all .15s;
+/* ── SLIDER ── */
+.slider-wrap{display:flex;align-items:center;gap:12px;}
+.slider-wrap input[type=range]{flex:1;accent-color:var(--primary);cursor:pointer;}
+.slider-val{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--primary);min-width:28px;text-align:right;}
+
+/* ── RUN BUTTON ── */
+.btn-run{
+  width:100%;
+  background:linear-gradient(135deg,var(--primary),var(--secondary));
+  border:none;color:white;font-family:var(--font);
+  font-size:15px;font-weight:700;
+  padding:13px;border-radius:12px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:opacity .2s,transform .1s;
+  box-shadow:0 4px 20px rgba(91,108,249,0.35);
 }
-.preset:hover { color: var(--gr); border-color: rgba(0,200,150,.4); background: rgba(0,200,150,.06); }
+.btn-run:hover{opacity:.9;}
+.btn-run:active{transform:scale(.98);}
+.btn-run:disabled{opacity:.4;cursor:not-allowed;transform:none;}
 
-/* Sliders */
-.slider-row { display: flex; align-items: center; gap: 10px; }
-.slider-row input[type=range] { flex: 1; accent-color: var(--gr); height: 3px; cursor: pointer; }
-.slider-val { font-family: var(--mono); font-size: 13px; color: var(--gr); font-weight: 600; min-width: 30px; text-align: right; }
-
-/* Toggle */
-.toggle-row {
-  display: flex; align-items: center; gap: 10px;
-  background: var(--s2); border: 1px solid var(--bd2); border-radius: var(--r);
-  padding: 10px 12px;
+/* ── TABS ── */
+.tabs{display:flex;background:var(--card2);border-bottom:1px solid var(--border);}
+.tab{
+  font-size:12px;font-weight:600;padding:12px 18px;
+  color:var(--muted);cursor:pointer;
+  border-bottom:2px solid transparent;
+  transition:all .2s;display:flex;align-items:center;gap:6px;
 }
-.toggle-info { flex: 1; }
-.toggle-label { font-size: 12px; font-weight: 500; color: var(--tx); }
-.toggle-sub { font-family: var(--mono); font-size: 10px; color: var(--tx3); margin-top: 2px; }
-.toggle-switch { position: relative; width: 36px; height: 20px; cursor: pointer; flex-shrink: 0; }
-.toggle-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
-.toggle-track {
-  position: absolute; inset: 0;
-  background: var(--s4); border-radius: 10px;
-  transition: background .2s;
+.tab:hover{color:var(--text);}
+.tab.active{color:var(--primary);border-bottom-color:var(--primary);}
+.tab-count{
+  background:rgba(91,108,249,0.15);color:var(--primary);
+  font-size:10px;padding:1px 6px;border-radius:4px;
+  display:none;
 }
-.toggle-switch input:checked + .toggle-track { background: var(--gr); }
-.toggle-knob {
-  position: absolute; top: 2px; left: 2px;
-  width: 16px; height: 16px;
-  background: white; border-radius: 50%;
-  transition: left .2s;
-  pointer-events: none;
+.tab-count.show{display:inline;}
+
+/* ── RESULTS TOOLBAR ── */
+.results-bar{
+  padding:10px 16px;background:var(--card2);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
 }
-.toggle-switch input:checked ~ .toggle-knob { left: 18px; }
-
-/* RUN button */
-.run-section { padding: 16px 20px; }
-.btn-run {
-  width: 100%;
-  background: var(--gr);
-  color: #06100d;
-  border: none;
-  border-radius: var(--r);
-  font-family: var(--sans);
-  font-size: 14px;
-  font-weight: 700;
-  padding: 11px;
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  transition: opacity .15s, transform .1s;
-  letter-spacing: .01em;
+.results-info{font-size:12px;color:var(--muted);flex:1;font-family:var(--mono);}
+.fmt-toggle{display:flex;background:var(--card);border:1px solid var(--border);border-radius:7px;overflow:hidden;}
+.fmt-btn{font-size:11px;font-weight:600;font-family:var(--font);padding:4px 10px;cursor:pointer;color:var(--muted);background:none;border:none;transition:all .15s;}
+.fmt-btn.active{background:var(--primary);color:white;}
+.btn-export{
+  background:var(--card);border:1px solid var(--border);
+  color:var(--muted);font-size:11px;font-weight:600;font-family:var(--font);
+  padding:5px 12px;border-radius:7px;cursor:pointer;
+  display:flex;align-items:center;gap:5px;transition:all .2s;
 }
-.btn-run:hover { opacity: .9; }
-.btn-run:active { transform: scale(.98); }
-.btn-run:disabled { opacity: .35; cursor: not-allowed; transform: none; }
-.run-meta {
-  margin-top: 10px;
-  font-family: var(--mono);
-  font-size: 10px;
-  color: var(--tx3);
-  text-align: center;
-  line-height: 1.6;
+.btn-export:hover{border-color:var(--primary);color:var(--primary);}
+
+/* ── RESULTS CONTENT ── */
+.results-content{padding:16px;overflow-y:auto;max-height:500px;}
+
+/* ── STATS ── */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}
+.stat-box{
+  background:var(--card2);border:1px solid var(--border);
+  border-radius:12px;padding:14px;text-align:center;
 }
-.run-meta a { color: var(--bl); text-decoration: none; }
-.run-meta a:hover { text-decoration: underline; }
+.stat-num{font-family:var(--mono);font-size:24px;font-weight:700;color:var(--primary);}
+.stat-label{font-size:10px;color:var(--muted);margin-top:3px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;}
 
-/* ── RIGHT PANEL ── */
-.right-panel {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+/* ── TABLE ── */
+.data-table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:11px;}
+.data-table th{background:var(--card2);color:var(--muted);text-align:left;padding:8px 10px;border:1px solid var(--border);font-size:10px;letter-spacing:.04em;position:sticky;top:0;font-weight:700;}
+.data-table td{padding:7px 10px;border:1px solid var(--border);color:var(--text);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.data-table tr:hover td{background:rgba(91,108,249,0.05);}
+.data-table tr:nth-child(even) td{background:rgba(255,255,255,0.02);}
+td.null{color:var(--muted);font-style:italic;}
+td.num{color:var(--yellow);}
+td.url a{color:#60a5fa;text-decoration:none;}
+td.url a:hover{text-decoration:underline;}
+
+/* ── JSON VIEW ── */
+.json-view{font-family:var(--mono);font-size:11px;line-height:1.8;white-space:pre-wrap;word-break:break-all;color:var(--muted);}
+.jk{color:#7bb8f0;}.js{color:#4ade80;}.jn{color:var(--yellow);}.jb{color:#f472b6;}.jx{color:var(--muted);}
+
+/* ── LOG ── */
+.log-wrap{padding:12px 16px;font-family:var(--mono);font-size:11px;line-height:2;max-height:500px;overflow-y:auto;}
+.log-line{display:flex;gap:10px;align-items:baseline;}
+.log-time{color:var(--muted);font-size:10px;min-width:70px;}
+.log-lv{font-size:9px;padding:2px 6px;border-radius:4px;min-width:36px;text-align:center;font-weight:700;flex-shrink:0;}
+.lv-info{background:rgba(96,165,250,.18);color:#60a5fa;}
+.lv-ok{background:rgba(34,197,94,.18);color:var(--green);}
+.lv-warn{background:rgba(245,158,11,.18);color:var(--yellow);}
+.lv-err{background:rgba(239,68,68,.18);color:var(--red);}
+.log-msg{color:var(--text);flex:1;}
+
+/* ── EMPTY ── */
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;gap:12px;text-align:center;}
+.empty i{font-size:48px;color:var(--border);}
+.empty h4{font-size:15px;font-weight:600;color:var(--muted);}
+.empty p{font-size:12px;color:var(--muted);opacity:.7;}
+
+/* ── PROGRESS ── */
+.progress-wrap{height:3px;background:var(--card2);display:none;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--secondary));width:0;transition:width .3s;}
+
+/* ── SPINNER ── */
+.spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;display:inline-block;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ── FOOTER ── */
+footer{
+  border-top:1px solid var(--border);
+  padding:20px 24px;
+  text-align:center;
+  color:var(--muted);
+  font-size:12px;
+  background:var(--card);
 }
+footer span{color:var(--primary);font-weight:600;}
+footer a{color:var(--primary);text-decoration:none;}
 
-/* Tabs */
-.tabs {
-  background: var(--s1);
-  border-bottom: 1px solid var(--bd);
-  display: flex;
-  padding: 0 20px;
+/* ── DEPLOY TAB ── */
+.deploy-wrap{padding:24px;max-width:640px;}
+.step-card{
+  background:var(--card2);border:1px solid var(--border);
+  border-radius:12px;padding:16px;margin-bottom:12px;
+  display:flex;gap:14px;
 }
-.tab {
-  font-family: var(--mono);
-  font-size: 11px;
-  padding: 12px 14px;
-  color: var(--tx3);
-  cursor: pointer;
-  border-bottom: 2px solid transparent;
-  transition: all .15s;
-  display: flex; align-items: center; gap: 6px;
+.step-num{
+  background:linear-gradient(135deg,var(--primary),var(--secondary));
+  color:white;font-weight:800;font-size:13px;
+  width:30px;height:30px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
 }
-.tab:hover { color: var(--tx2); }
-.tab.act { color: var(--gr); border-bottom-color: var(--gr); }
-.tab-badge {
-  background: rgba(0,200,150,.15);
-  color: var(--gr);
-  font-size: 9px; padding: 1px 6px; border-radius: 3px;
-  display: none;
-}
-.tab-badge.show { display: inline; }
+.step-title{font-size:13px;font-weight:700;margin-bottom:6px;}
+.step-body{font-family:var(--mono);font-size:11px;color:var(--muted);line-height:1.9;}
+.step-body a{color:#60a5fa;}
+.step-body code{color:var(--green);background:rgba(34,197,94,.08);padding:1px 5px;border-radius:4px;}
 
-/* Results toolbar */
-.results-bar {
-  padding: 10px 20px;
-  background: var(--s1);
-  border-bottom: 1px solid var(--bd);
-  display: flex; align-items: center; gap: 10px;
-}
-.results-count { font-family: var(--mono); font-size: 11px; color: var(--tx3); flex: 1; }
-.fmt-toggle { display: flex; background: var(--s3); border: 1px solid var(--bd); border-radius: 5px; overflow: hidden; }
-.fmt-btn { font-family: var(--mono); font-size: 10px; padding: 4px 10px; cursor: pointer; color: var(--tx3); background: none; border: none; transition: all .15s; }
-.fmt-btn.act { background: var(--gr); color: #06100d; font-weight: 600; }
-.btn-export {
-  background: var(--s3); border: 1px solid var(--bd2); color: var(--tx2);
-  font-family: var(--mono); font-size: 10px; padding: 5px 10px; border-radius: var(--r);
-  cursor: pointer; display: flex; align-items: center; gap: 5px; transition: all .15s;
-}
-.btn-export:hover { border-color: var(--gr); color: var(--gr); }
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
 
-/* Panels */
-.content-panels { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
-.content-pane { display: none; flex: 1; overflow: hidden; flex-direction: column; }
-.content-pane.act { display: flex; }
-
-/* Empty state */
-.empty {
-  flex: 1; display: flex; flex-direction: column;
-  align-items: center; justify-content: center; gap: 12px;
-  color: var(--tx3); padding: 40px; text-align: center;
-}
-.empty i { font-size: 48px; opacity: .25; }
-.empty-t { font-size: 15px; font-weight: 500; color: var(--tx2); }
-.empty-s { font-family: var(--mono); font-size: 11px; }
-
-/* Results content */
-.results-scroll { flex: 1; overflow-y: auto; padding: 16px; }
-
-/* Stats grid */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-  margin-bottom: 16px;
-}
-.stat-card {
-  background: var(--s2);
-  border: 1px solid var(--bd);
-  border-radius: var(--r);
-  padding: 12px;
-  text-align: center;
-}
-.stat-v { font-family: var(--mono); font-size: 22px; font-weight: 600; color: var(--gr); }
-.stat-k { font-family: var(--mono); font-size: 9px; color: var(--tx3); margin-top: 3px; letter-spacing: .06em; }
-
-/* Table */
-.data-table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 11px; }
-.data-table th {
-  background: var(--s2); color: var(--tx3);
-  text-align: left; padding: 7px 10px;
-  border: 1px solid var(--bd); font-size: 10px;
-  letter-spacing: .04em; position: sticky; top: 0;
-}
-.data-table td {
-  padding: 6px 10px; border: 1px solid var(--bd); color: var(--tx);
-  max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-}
-.data-table tr:nth-child(even) td { background: rgba(255,255,255,.02); }
-.data-table tr:hover td { background: rgba(0,200,150,.04); }
-td.is-url a { color: var(--bl); text-decoration: none; }
-td.is-url a:hover { text-decoration: underline; }
-td.is-null { color: var(--tx3); font-style: italic; }
-td.is-num { color: var(--ye); }
-
-/* JSON view */
-.json-view { font-family: var(--mono); font-size: 11px; line-height: 1.8; white-space: pre-wrap; word-break: break-all; color: var(--tx2); }
-.jk { color: #7bb8f0; }
-.js { color: #5edf9b; }
-.jn { color: #f5c842; }
-.jb { color: #f87eb4; }
-.jx { color: var(--tx3); }
-
-/* Log */
-.log-pane { flex: 1; overflow-y: auto; padding: 12px 16px; font-family: var(--mono); font-size: 11px; line-height: 2; }
-.log-line { display: flex; gap: 10px; align-items: baseline; }
-.log-t { color: var(--tx3); font-size: 10px; min-width: 65px; }
-.log-lv { font-size: 9px; padding: 1px 6px; border-radius: 3px; min-width: 36px; text-align: center; font-weight: 700; flex-shrink: 0; }
-.lv-info { background: rgba(59,140,248,.18); color: var(--bl); }
-.lv-ok   { background: rgba(0,200,150,.18); color: var(--gr); }
-.lv-warn { background: rgba(245,166,35,.18); color: var(--ye); }
-.lv-err  { background: rgba(255,85,85,.18); color: var(--re); }
-.log-m { color: var(--tx); flex: 1; }
-
-/* Progress bar */
-.progress-wrap { height: 2px; background: var(--s3); display: none; }
-.progress-fill { height: 100%; background: var(--gr); width: 0; transition: width .35s; }
-
-/* Spinner */
-.spin { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,.2); border-top-color: #06100d; border-radius: 50%; animation: spin .7s linear infinite; display: inline-block; }
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* Meta pill */
-.meta-pill {
-  display: inline-flex; align-items: center; gap: 5px;
-  font-family: var(--mono); font-size: 10px;
-  background: var(--s3); border: 1px solid var(--bd2);
-  padding: 3px 9px; border-radius: 100px; color: var(--tx2);
-}
-.meta-pill.gr { border-color: rgba(0,200,150,.3); color: var(--gr); background: rgba(0,200,150,.07); }
-.meta-pill.ye { border-color: rgba(245,166,35,.3); color: var(--ye); background: rgba(245,166,35,.07); }
-.meta-pill.re { border-color: rgba(255,85,85,.3); color: var(--re); background: rgba(255,85,85,.07); }
-
-/* Coverage bars */
-.cov-item { margin-bottom: 8px; }
-.cov-head { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 10px; color: var(--tx2); margin-bottom: 4px; }
-.cov-bg { height: 3px; background: var(--s3); border-radius: 2px; overflow: hidden; }
-.cov-fill { height: 100%; border-radius: 2px; transition: width .5s ease; }
-
-/* Field chips */
-.field-chips { display: flex; flex-wrap: wrap; gap: 5px; }
-.chip { font-family: var(--mono); font-size: 10px; padding: 3px 8px; border-radius: 4px; border: 1px solid var(--bd2); color: var(--tx3); background: var(--s2); }
-.chip.hi { color: var(--gr); border-color: rgba(0,200,150,.3); background: rgba(0,200,150,.07); }
-
-/* Alert box */
-.alert {
-  padding: 12px 14px; border-radius: var(--r); font-family: var(--mono); font-size: 11px; line-height: 1.6;
-  display: flex; gap: 10px; align-items: flex-start;
-  margin-bottom: 12px;
-}
-.alert-info { background: rgba(59,140,248,.1); border: 1px solid rgba(59,140,248,.25); color: #9ecbff; }
-.alert-warn { background: rgba(245,166,35,.1); border: 1px solid rgba(245,166,35,.25); color: #f5d08a; }
-.alert i { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
-
-/* Sidebar stats panel */
-.right-panels { flex: 1; display: flex; overflow: hidden; }
-.results-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; border-right: 1px solid var(--bd); }
-.results-side { width: 240px; display: flex; flex-direction: column; overflow-y: auto; background: var(--s1); padding: 16px; gap: 16px; }
-.side-title { font-family: var(--mono); font-size: 10px; color: var(--tx3); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px; }
-
-/* Scrollbar */
-::-webkit-scrollbar { width: 4px; height: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--bd3); border-radius: 2px; }
-
-/* Responsive */
-@media (max-width: 900px) {
-  .app { grid-template-columns: 1fr; }
-  .left-panel { max-height: 70vh; }
-  .stats-grid { grid-template-columns: repeat(2, 1fr); }
-  .results-side { display: none; }
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .grid{grid-template-columns:1fr;}
+  .stats-row{grid-template-columns:repeat(2,1fr);}
+  .hero h1{font-size:28px;}
+  .nav-links{display:none;}
 }
 </style>
 </head>
 <body>
 
-<!-- TOP BAR -->
-<div class="topbar">
-  <div class="logo">
-    <div class="logo-dot"></div>
-    <span class="logo-text">Grok<span class="logo-accent">Scraper</span></span>
+<!-- NAVBAR -->
+<nav>
+  <div class="nav-brand">
+    <i class="fa-solid fa-spider"></i>
+    AI Web Scraper
   </div>
-  <div class="topbar-sep"></div>
-  <div class="topbar-badge">xAI GROK-3-MINI</div>
-  <div class="topbar-links">
-    <a class="topbar-link" href="https://console.x.ai" target="_blank" rel="noopener">
-      <i class="ti ti-key"></i> Get API Key
-    </a>
-    <a class="topbar-link" href="https://github.com" target="_blank" rel="noopener">
-      <i class="ti ti-brand-github"></i> GitHub
-    </a>
+  <div class="nav-links">
+    <a class="nav-link" href="https://console.x.ai" target="_blank"><i class="fa-solid fa-key"></i> Get API Key</a>
+    <a class="nav-link" href="https://github.com" target="_blank"><i class="fa-brands fa-github"></i> GitHub</a>
+    <span class="nav-badge">Powered by Grok</span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag"><i class="fa-solid fa-bolt"></i> AI-Powered Extraction</div>
+  <h1>AI Web Scraper<br/><span>Extract Any Data, Instantly</span></h1>
+  <p>Paste a URL, define your schema, and let Grok AI extract structured data from any website in seconds.</p>
+  <div class="hero-pills">
+    <div class="pill"><i class="fa-solid fa-circle-check"></i> Free to use</div>
+    <div class="pill"><i class="fa-solid fa-circle-check"></i> No coding needed</div>
+    <div class="pill"><i class="fa-solid fa-circle-check"></i> Export JSON & CSV</div>
+    <div class="pill"><i class="fa-solid fa-circle-check"></i> Powered by xAI Grok</div>
   </div>
 </div>
 
-<!-- APP SHELL -->
-<div class="app">
+<!-- MAIN -->
+<div class="container">
+<div class="grid">
 
-  <!-- ══ LEFT PANEL ══ -->
-  <div class="left-panel">
+  <!-- LEFT: CONFIG -->
+  <div style="display:flex;flex-direction:column;gap:20px;">
 
 
 
-    <!-- Backend URL -->
-    <div class="panel-section">
-      <div class="section-label"><i class="ti ti-server"></i> backend url</div>
-      <input type="url" id="backend-url" placeholder="https://your-app.onrender.com/scrape" />
-      <div style="margin-top:6px; font-family:var(--mono); font-size:10px; color:var(--tx3); line-height:1.5;">
-        Deploy <code style="color:var(--gr);">server.js</code> → paste your Netlify URL here
+    <!-- Target URL -->
+    <div class="card">
+      <div class="card-header">
+        <i class="fa-solid fa-globe"></i>
+        <h3>Target Website</h3>
+      </div>
+      <div class="card-body">
+        <div class="form-group">
+          <label>URL to Scrape</label>
+          <input type="url" id="target-url" placeholder="https://example.com/products" />
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label>Quick Presets</label>
+          <div class="presets">
+            <button class="preset-btn" onclick="loadPreset('hn')">HN Stories</button>
+            <button class="preset-btn" onclick="loadPreset('quotes')">Quotes</button>
+            <button class="preset-btn" onclick="loadPreset('books')">Books</button>
+            <button class="preset-btn" onclick="loadPreset('jobs')">Jobs</button>
+            <button class="preset-btn" onclick="loadPreset('news')">News</button>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- Target URL & Presets -->
-    <div class="panel-section">
-      <div class="section-label"><i class="ti ti-world"></i> target url</div>
-      <input type="url" id="target-url" placeholder="https://example.com/products" />
-      <div class="presets" style="margin-top:8px;">
-        <div class="preset" onclick="loadPreset('hn')">HN Stories</div>
-        <div class="preset" onclick="loadPreset('quotes')">Quotes</div>
-        <div class="preset" onclick="loadPreset('books')">Books</div>
-        <div class="preset" onclick="loadPreset('jobs')">Job Board</div>
-        <div class="preset" onclick="loadPreset('news')">News Site</div>
+    <!-- Extraction Mode -->
+    <div class="card">
+      <div class="card-header">
+        <i class="fa-solid fa-microchip"></i>
+        <h3>Extraction Mode</h3>
       </div>
-    </div>
-
-    <!-- Mode -->
-    <div class="panel-section">
-      <div class="section-label"><i class="ti ti-cpu"></i> extraction mode</div>
-      <div class="mode-grid">
-        <div class="mode-card sel" data-mode="structured" onclick="pickMode(this)">
-          <div class="mode-icon"><i class="ti ti-table"></i></div>
-          <div class="mode-name">Structured</div>
-          <div class="mode-desc">Defined field schema → clean JSON</div>
-        </div>
-        <div class="mode-card" data-mode="freeform" onclick="pickMode(this)">
-          <div class="mode-icon"><i class="ti ti-bulb"></i></div>
-          <div class="mode-name">AI Freeform</div>
-          <div class="mode-desc">Grok decides what's valuable</div>
-        </div>
-        <div class="mode-card" data-mode="summary" onclick="pickMode(this)">
-          <div class="mode-icon"><i class="ti ti-file-text"></i></div>
-          <div class="mode-name">Summarize</div>
-          <div class="mode-desc">Intelligence report on the page</div>
-        </div>
-        <div class="mode-card" data-mode="links" onclick="pickMode(this)">
-          <div class="mode-icon"><i class="ti ti-link"></i></div>
-          <div class="mode-name">Link Map</div>
-          <div class="mode-desc">All links, categorized</div>
+      <div class="card-body">
+        <div class="mode-grid">
+          <button class="mode-btn active" data-mode="structured" onclick="pickMode(this)">
+            <i class="fa-solid fa-table"></i>
+            <strong>Structured</strong>
+            <small>Extract your defined fields</small>
+          </button>
+          <button class="mode-btn" data-mode="freeform" onclick="pickMode(this)">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <strong>AI Freeform</strong>
+            <small>Grok decides what's useful</small>
+          </button>
+          <button class="mode-btn" data-mode="summary" onclick="pickMode(this)">
+            <i class="fa-solid fa-file-lines"></i>
+            <strong>Summarize</strong>
+            <small>Smart page summary</small>
+          </button>
+          <button class="mode-btn" data-mode="links" onclick="pickMode(this)">
+            <i class="fa-solid fa-link"></i>
+            <strong>Link Map</strong>
+            <small>All links categorized</small>
+          </button>
         </div>
       </div>
     </div>
 
     <!-- Schema -->
-    <div class="panel-section">
-      <div class="section-label"><i class="ti ti-code"></i> data schema</div>
-      <div class="schema-box">
-        <div class="schema-head">
-          <span class="schema-head-title">FIELDS TO EXTRACT</span>
-          <button class="btn-add" onclick="addField()"><i class="ti ti-plus"></i> field</button>
-        </div>
-        <div class="fields-list" id="fields-list">
-          <div class="field-row">
-            <input type="text" value="title" placeholder="field name" />
-            <select><option>string</option><option>number</option><option>url</option><option>date</option><option>boolean</option><option>array</option></select>
-            <button class="btn-del" onclick="delField(this)"><i class="ti ti-x"></i></button>
+    <div class="card">
+      <div class="card-header">
+        <i class="fa-solid fa-code"></i>
+        <h3>Data Schema</h3>
+        <span>Fields to extract</span>
+      </div>
+      <div class="card-body">
+        <div class="schema-wrap">
+          <div class="schema-top">
+            <span>DEFINE FIELDS</span>
+            <button class="btn-sm" onclick="addField()"><i class="fa-solid fa-plus"></i> Add Field</button>
           </div>
-          <div class="field-row">
-            <input type="text" value="price" placeholder="field name" />
-            <select><option>string</option><option selected>number</option><option>url</option><option>date</option><option>boolean</option><option>array</option></select>
-            <button class="btn-del" onclick="delField(this)"><i class="ti ti-x"></i></button>
-          </div>
-          <div class="field-row">
-            <input type="text" value="url" placeholder="field name" />
-            <select><option>string</option><option>number</option><option selected>url</option><option>date</option><option>boolean</option><option>array</option></select>
-            <button class="btn-del" onclick="delField(this)"><i class="ti ti-x"></i></button>
+          <div class="fields-list" id="fields-list">
+            <div class="field-row">
+              <input type="text" value="title" placeholder="field name"/>
+              <select><option>string</option><option>number</option><option>url</option><option>date</option><option>boolean</option><option>array</option></select>
+              <button class="btn-del" onclick="this.closest('.field-row').remove()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="field-row">
+              <input type="text" value="price" placeholder="field name"/>
+              <select><option>string</option><option selected>number</option><option>url</option><option>date</option><option>boolean</option><option>array</option></select>
+              <button class="btn-del" onclick="this.closest('.field-row').remove()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="field-row">
+              <input type="text" value="url" placeholder="field name"/>
+              <select><option>string</option><option>number</option><option selected>url</option><option>date</option><option>boolean</option><option>array</option></select>
+              <button class="btn-del" onclick="this.closest('.field-row').remove()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-
-    <!-- Instructions -->
-    <div class="panel-section">
-      <div class="section-label"><i class="ti ti-message"></i> custom instructions</div>
-      <textarea id="instructions" rows="3" placeholder="e.g. Only extract in-stock items. Include the rating as a decimal number. Skip sponsored results."></textarea>
     </div>
 
     <!-- Settings -->
-    <div class="panel-section">
-      <div class="section-label"><i class="ti ti-settings"></i> settings</div>
-      <label>max records: <span id="max-lbl" style="color:var(--gr); font-weight:600;">10</span></label>
-      <div class="slider-row" style="margin-bottom:12px;">
-        <input type="range" id="max-items" min="1" max="50" value="10" oninput="document.getElementById('max-lbl').textContent=this.value" />
-        <span class="slider-val" id="max-lbl2"></span>
+    <div class="card">
+      <div class="card-header">
+        <i class="fa-solid fa-sliders"></i>
+        <h3>Settings</h3>
       </div>
-
-
+      <div class="card-body">
+        <div class="form-group">
+          <label>Custom Instructions</label>
+          <textarea id="instructions" rows="2" placeholder="e.g. Only extract in-stock items. Skip sponsored listings."></textarea>
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label>Max Records: <span id="max-lbl" style="color:var(--primary);font-weight:700;">10</span></label>
+          <div class="slider-wrap">
+            <input type="range" id="max-items" min="1" max="50" value="10" oninput="document.getElementById('max-lbl').textContent=this.value"/>
+            <span class="slider-val" id="max-lbl2"></span>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Run -->
-    <div class="run-section">
-      <button class="btn-run" id="run-btn" onclick="runScrape()">
-        <i class="ti ti-player-play"></i> run scraper
-      </button>
-      <div class="run-meta">
-        Backend: <a href="https://render.com" target="_blank">Render.com</a> (free) ·
-        AI: <a href="https://x.ai/api" target="_blank">xAI Grok</a> · 
-        Frontend: <a href="https://pages.github.com" target="_blank">GitHub Pages</a> (free)
-      </div>
+    <button class="btn-run" id="run-btn" onclick="runScrape()">
+      <i class="fa-solid fa-play"></i> Run Scraper
+    </button>
+    <div style="text-align:center;font-size:11px;color:var(--muted);margin-top:-10px;">
+      Backend: <a href="https://render.com" target="_blank" style="color:var(--primary);">Render.com</a> &nbsp;·&nbsp;
+      AI: <a href="https://x.ai/api" target="_blank" style="color:var(--primary);">xAI Grok</a> &nbsp;·&nbsp;
+      Frontend: <a href="https://pages.github.com" target="_blank" style="color:var(--primary);">GitHub Pages</a>
     </div>
+  </div>
 
-  </div><!-- /left-panel -->
-
-  <!-- ══ RIGHT PANEL ══ -->
-  <div class="right-panel">
-
-    <!-- Tabs -->
+  <!-- RIGHT: RESULTS -->
+  <div class="card" style="position:sticky;top:80px;">
     <div class="tabs">
-      <div class="tab act" data-tab="results" onclick="switchTab('results')">
-        <i class="ti ti-table"></i> results
-        <span class="tab-badge" id="badge-results"></span>
+      <div class="tab active" data-tab="results" onclick="switchTab('results')">
+        <i class="fa-solid fa-table-cells"></i> Results
+        <span class="tab-count" id="badge-results"></span>
       </div>
       <div class="tab" data-tab="log" onclick="switchTab('log')">
-        <i class="ti ti-terminal"></i> activity log
-        <span class="tab-badge" id="badge-log"></span>
+        <i class="fa-solid fa-terminal"></i> Activity Log
       </div>
       <div class="tab" data-tab="deploy" onclick="switchTab('deploy')">
-        <i class="ti ti-rocket"></i> deployment guide
+        <i class="fa-solid fa-rocket"></i> How to Deploy
       </div>
     </div>
 
-    <!-- Progress bar -->
     <div class="progress-wrap" id="prog-wrap">
       <div class="progress-fill" id="prog-fill"></div>
     </div>
 
-    <!-- Content panels -->
-    <div class="content-panels">
-
-      <!-- RESULTS TAB -->
-      <div class="content-pane act" id="pane-results">
-        <div class="results-bar">
-          <span class="results-count" id="res-count">no data yet</span>
-          <div class="fmt-toggle">
-            <button class="fmt-btn act" onclick="setFmt('table',this)">table</button>
-            <button class="fmt-btn" onclick="setFmt('json',this)">json</button>
-            <button class="fmt-btn" onclick="setFmt('raw',this)">raw</button>
-          </div>
-          <button class="btn-export" onclick="doExport('json')"><i class="ti ti-download"></i> json</button>
-          <button class="btn-export" onclick="doExport('csv')"><i class="ti ti-download"></i> csv</button>
+    <!-- Results pane -->
+    <div id="pane-results">
+      <div class="results-bar">
+        <span class="results-info" id="res-info">No data yet — run a scrape job</span>
+        <div class="fmt-toggle">
+          <button class="fmt-btn active" onclick="setFmt('table',this)">Table</button>
+          <button class="fmt-btn" onclick="setFmt('json',this)">JSON</button>
+          <button class="fmt-btn" onclick="setFmt('raw',this)">Raw</button>
         </div>
+        <button class="btn-export" onclick="doExport('json')"><i class="fa-solid fa-download"></i> JSON</button>
+        <button class="btn-export" onclick="doExport('csv')"><i class="fa-solid fa-download"></i> CSV</button>
+      </div>
+      <div id="stats-row" style="display:none;" class="results-content">
+        <div class="stats-row">
+          <div class="stat-box"><div class="stat-num" id="s-rec">0</div><div class="stat-label">Records</div></div>
+          <div class="stat-box"><div class="stat-num" id="s-fld">0</div><div class="stat-label">Fields</div></div>
+          <div class="stat-box"><div class="stat-num" id="s-time">0s</div><div class="stat-label">Time</div></div>
+          <div class="stat-box"><div class="stat-num" id="s-qual">0%</div><div class="stat-label">Quality</div></div>
+        </div>
+      </div>
+      <div class="results-content" id="res-content">
+        <div class="empty">
+          <i class="fa-solid fa-database"></i>
+          <h4>No Data Yet</h4>
+          <p>Configure the scraper on the left and hit Run</p>
+        </div>
+      </div>
+    </div>
 
-        <div class="right-panels">
-          <div class="results-main">
-            <div class="results-scroll" id="res-scroll">
-              <div class="empty">
-                <i class="ti ti-database-off"></i>
-                <div class="empty-t">no data extracted yet</div>
-                <div class="empty-s">configure the scraper and click run</div>
-              </div>
+    <!-- Log pane -->
+    <div id="pane-log" style="display:none;">
+      <div style="padding:10px 16px;background:var(--card2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+        <span style="font-size:12px;font-weight:600;color:var(--muted);"><i class="fa-solid fa-terminal"></i> Activity Log</span>
+        <button class="btn-export" onclick="clearLog()">Clear</button>
+      </div>
+      <div class="log-wrap" id="log-wrap">
+        <div style="color:var(--muted);text-align:center;padding:30px;font-size:12px;">No activity yet</div>
+      </div>
+    </div>
+
+    <!-- Deploy pane -->
+    <div id="pane-deploy" style="display:none;">
+      <div class="deploy-wrap">
+        <h3 style="font-size:16px;font-weight:700;margin-bottom:4px;">Deployment Guide</h3>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:20px;">Free stack: Render + GitHub Pages + xAI Grok</p>
+
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <div>
+            <div class="step-title">Get xAI API Key</div>
+            <div class="step-body">
+              → <a href="https://console.x.ai" target="_blank">console.x.ai</a> → Sign up → API Keys → Create<br/>
+              → Copy key starting with <code>xai-...</code><br/>
+              → Enable Data Sharing for <code>$150/month free credits</code>
             </div>
           </div>
-          <div class="results-side">
-            <div>
-              <div class="side-title">stats</div>
-              <div class="stats-grid" style="grid-template-columns:1fr 1fr; gap:8px;" id="side-stats">
-                <div class="stat-card"><div class="stat-v" id="s-rec">—</div><div class="stat-k">records</div></div>
-                <div class="stat-card"><div class="stat-v" id="s-fld">—</div><div class="stat-k">fields</div></div>
-                <div class="stat-card"><div class="stat-v" id="s-time">—</div><div class="stat-k">seconds</div></div>
-                <div class="stat-card"><div class="stat-v" id="s-qual">—</div><div class="stat-k">quality</div></div>
-              </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <div>
+            <div class="step-title">Deploy Backend on Render</div>
+            <div class="step-body">
+              → <a href="https://render.com" target="_blank">render.com</a> → Sign up with GitHub<br/>
+              → New → Web Service → connect your repo<br/>
+              → Start command: <code>node server.js</code> → Free tier<br/>
+              → Add env var: <code>XAI_API_KEY</code> = your key<br/>
+              → Copy your URL: <code>https://yourapp.onrender.com</code>
             </div>
-            <div>
-              <div class="side-title">field coverage</div>
-              <div id="side-cov"><div style="font-family:var(--mono);font-size:10px;color:var(--tx3);">run a job first</div></div>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <div>
+            <div class="step-title">Deploy Frontend on GitHub Pages</div>
+            <div class="step-body">
+              → Upload files to GitHub repo<br/>
+              → Settings → Pages → Branch: main → root <code>/</code><br/>
+              → Live at: <code>https://username.github.io/repo</code>
             </div>
-            <div>
-              <div class="side-title">grok model</div>
-              <div id="side-model" style="font-family:var(--mono);font-size:10px;color:var(--tx3);">—</div>
-            </div>
-            <div>
-              <div class="side-title">tokens used</div>
-              <div id="side-tokens" style="font-family:var(--mono);font-size:10px;color:var(--tx3);">—</div>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">4</div>
+          <div>
+            <div class="step-title">Configure & Scrape</div>
+            <div class="step-body">
+              → Paste your Render URL in the Backend URL field<br/>
+              → Pick a preset or enter any URL<br/>
+              → Click <code>Run Scraper</code> 🚀
             </div>
           </div>
         </div>
       </div>
-
-      <!-- LOG TAB -->
-      <div class="content-pane" id="pane-log">
-        <div style="padding:10px 16px; background:var(--s1); border-bottom:1px solid var(--bd); display:flex; align-items:center; gap:10px;">
-          <span style="font-family:var(--mono); font-size:11px; color:var(--tx3); flex:1;"><i class="ti ti-terminal"></i> activity log</span>
-          <button class="btn-export" onclick="clearLog()">clear</button>
-        </div>
-        <div class="log-pane" id="log-pane">
-          <div style="color:var(--tx3); text-align:center; padding:20px;">no activity</div>
-        </div>
-      </div>
-
-      <!-- DEPLOY TAB -->
-      <div class="content-pane" id="pane-deploy" style="overflow-y:auto;">
-        <div style="padding:24px; max-width:660px;">
-          <h2 style="font-size:18px; font-weight:700; margin-bottom:6px;">Free Deployment Guide</h2>
-          <p style="font-family:var(--mono); font-size:11px; color:var(--tx2); margin-bottom:24px; line-height:1.7;">Full stack: xAI Grok API + Render.com + GitHub Pages. Zero cost for most dev workloads.</p>
-
-          <div class="alert alert-info" style="margin-bottom:20px;">
-            <i class="ti ti-info-circle"></i>
-            <div>New xAI accounts get <strong>$25 free credits</strong> on signup + <strong>$150/month</strong> via the data-sharing program at <a href="https://console.x.ai" target="_blank" style="color:var(--bl);">console.x.ai</a></div>
-          </div>
-
-          <div style="display:flex; flex-direction:column; gap:20px;">
-
-            <div>
-              <div style="font-weight:700; font-size:14px; margin-bottom:8px; display:flex; align-items:center; gap:8px;">
-                <span style="background:var(--gr); color:#06100d; width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; flex-shrink:0;">1</span>
-                Get your xAI API Key
-              </div>
-              <div style="font-family:var(--mono); font-size:11px; color:var(--tx2); line-height:1.8; padding-left:30px;">
-                → Go to <a href="https://console.x.ai" target="_blank" style="color:var(--bl);">console.x.ai</a><br>
-                → Create account → API Keys → New Key<br>
-                → Copy the key (starts with <code style="color:var(--gr);">xai-</code>)<br>
-                → Optionally: Settings → Data Sharing → enable for $150/mo free credits
-              </div>
-            </div>
-
-            <div>
-              <div style="font-weight:700; font-size:14px; margin-bottom:8px; display:flex; align-items:center; gap:8px;">
-                <span style="background:var(--gr); color:#06100d; width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; flex-shrink:0;">2</span>
-                Deploy backend to Netlify (free)
-              </div>
-              <div style="font-family:var(--mono); font-size:11px; color:var(--tx2); line-height:1.8; padding-left:30px;">
-                → Download this project's zip (GitHub repo)<br>
-                → <a href="https://app.render.com" target="_blank" style="color:var(--bl);">app.render.com</a> → "Add new site" → Deploy manually<br>
-                → Or: <code style="color:var(--gr);">netlify init</code> → link GitHub repo → auto-deploy<br>
-                → Site settings → Environment variables → Add <code style="color:var(--gr);">XAI_API_KEY</code><br>
-                → Your backend URL: <code style="color:var(--ye);">https://yoursite.onrender.com/scrape</code>
-              </div>
-            </div>
-
-            <div>
-              <div style="font-weight:700; font-size:14px; margin-bottom:8px; display:flex; align-items:center; gap:8px;">
-                <span style="background:var(--gr); color:#06100d; width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; flex-shrink:0;">3</span>
-                Deploy frontend to GitHub Pages (free)
-              </div>
-              <div style="font-family:var(--mono); font-size:11px; color:var(--tx2); line-height:1.8; padding-left:30px;">
-                → Push <code style="color:var(--gr);">public/index.html</code> to your GitHub repo<br>
-                → Settings → Pages → Source: main branch → /public<br>
-                → Your URL: <code style="color:var(--ye);">https://username.github.io/repo-name</code><br>
-                → Or use Netlify to host both (simpler)
-              </div>
-            </div>
-
-            <div>
-              <div style="font-weight:700; font-size:14px; margin-bottom:8px; display:flex; align-items:center; gap:8px;">
-                <span style="background:var(--gr); color:#06100d; width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; flex-shrink:0;">4</span>
-                Configure and scrape
-              </div>
-              <div style="font-family:var(--mono); font-size:11px; color:var(--tx2); line-height:1.8; padding-left:30px;">
-                → Paste your API key in the left panel<br>
-                → Paste your Netlify backend URL<br>
-                → Enter target URL, set schema, click run<br>
-                → Export as JSON or CSV
-              </div>
-            </div>
-
-          </div>
-
-          <div style="margin-top:24px; padding:14px; background:var(--s2); border:1px solid var(--bd2); border-radius:var(--r); font-family:var(--mono); font-size:11px; color:var(--tx2); line-height:1.8;">
-            <div style="color:var(--tx3); font-size:10px; letter-spacing:.06em; margin-bottom:8px;">FREE TIER LIMITS</div>
-            Render.com: <span style="color:var(--gr);">125,000 invocations/month</span><br>
-            Netlify Bandwidth: <span style="color:var(--gr);">100 GB/month</span><br>
-            GitHub Pages: <span style="color:var(--gr);">Unlimited static hosting</span><br>
-            xAI Credits: <span style="color:var(--gr);">$25 signup + $150/mo (data sharing)</span><br>
-            Grok 3 Mini: <span style="color:var(--ye);">$0.30/$0.50 per 1M tokens</span>
-          </div>
-        </div>
-      </div>
-
     </div>
   </div>
-</div><!-- /app -->
+
+</div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  Built with ❤️ using <span>xAI Grok</span> · <span>Render</span> · <span>GitHub Pages</span> &nbsp;|&nbsp;
+  <a href="https://console.x.ai" target="_blank">Get free API credits →</a>
+</footer>
 
 <script>
-// ================================================================
-// ✏️  Paste your Render backend URL below after deploying
-//     Format: https://YOUR-APP-NAME.onrender.com/scrape
-const BACKEND_URL = "PASTE_YOUR_RENDER_URL_HERE/scrape";
-// ================================================================
+// ── CONFIG ──────────────────────────────────────────────
+const BACKEND_URL = "https://aiwebscrapper.onrender.com/scrape";
 
-// auto-fill backend URL on page load
-document.addEventListener("DOMContentLoaded", () => {
-  if (BACKEND_URL && !BACKEND_URL.includes("PASTE_YOUR")) {
-    document.getElementById("backend-url").value = BACKEND_URL;
-  }
-});
+// ── STATE ──────────────────────────────────────────────
+let mode = 'structured', fmt = 'table', data = [], rawOut = '', jobMeta = {};
 
-// ─── STATE ───────────────────────────────────────────────
-let mode = 'structured';
-let fmt  = 'table';
-let data = [];
-let rawOut = '';
-let jobMeta = {};
-let jobStart = 0;
-
-// ─── PRESETS ─────────────────────────────────────────────
+// ── PRESETS ────────────────────────────────────────────
 const PRESETS = {
-  hn:     { url:'https://news.ycombinator.com', instr:'Extract all story titles, scores, author names, and comment counts from the front page.', fields:[['title','string'],['points','number'],['author','string'],['comments','number'],['url','url']] },
-  quotes: { url:'https://quotes.toscrape.com', instr:'Extract all quotes, their authors, and associated tags.', fields:[['quote','string'],['author','string'],['tags','array']] },
-  books:  { url:'https://books.toscrape.com', instr:'Extract book titles, prices, star ratings, and availability.', fields:[['title','string'],['price','number'],['rating','string'],['available','boolean']] },
-  jobs:   { url:'https://remoteok.com', instr:'Extract job titles, companies, locations, and salary ranges if available.', fields:[['title','string'],['company','string'],['location','string'],['salary','string'],['url','url']] },
-  news:   { url:'https://news.ycombinator.com', instr:'Extract news article headlines, sources, and published dates.', fields:[['headline','string'],['source','string'],['date','date'],['url','url']] },
+  hn:     { url:'https://news.ycombinator.com', instr:'Extract story titles, scores, authors, and comment counts.', fields:[['title','string'],['points','number'],['author','string'],['comments','number'],['url','url']] },
+  quotes: { url:'https://quotes.toscrape.com', instr:'Extract all quotes, authors, and tags.', fields:[['quote','string'],['author','string'],['tags','array']] },
+  books:  { url:'https://books.toscrape.com', instr:'Extract book titles, prices, ratings, and availability.', fields:[['title','string'],['price','number'],['rating','string'],['available','boolean']] },
+  jobs:   { url:'https://remoteok.com', instr:'Extract job titles, companies, locations, salaries.', fields:[['title','string'],['company','string'],['location','string'],['salary','string'],['url','url']] },
+  news:   { url:'https://news.ycombinator.com', instr:'Extract headlines, sources, and dates.', fields:[['headline','string'],['source','string'],['date','date'],['url','url']] },
 };
 
 function loadPreset(key) {
@@ -806,136 +622,101 @@ function loadPreset(key) {
   const list = document.getElementById('fields-list');
   list.innerHTML = '';
   const types = ['string','number','url','date','boolean','array'];
-  p.fields.forEach(([name,type]) => {
-    const r = document.createElement('div');
-    r.className = 'field-row';
-    r.innerHTML = `<input type="text" value="${name}" /><select>${types.map(t=>`<option${t===type?' selected':''}>${t}</option>`).join('')}</select><button class="btn-del" onclick="delField(this)"><i class="ti ti-x"></i></button>`;
+  p.fields.forEach(([n,t]) => {
+    const r = document.createElement('div'); r.className = 'field-row';
+    r.innerHTML = `<input type="text" value="${n}"/><select>${types.map(x=>`<option${x===t?' selected':''}>${x}</option>`).join('')}</select><button class="btn-del" onclick="this.closest('.field-row').remove()"><i class="fa-solid fa-xmark"></i></button>`;
     list.appendChild(r);
   });
 }
 
-// ─── SCHEMA ──────────────────────────────────────────────
+// ── SCHEMA ─────────────────────────────────────────────
 function addField() {
-  const r = document.createElement('div');
-  r.className = 'field-row';
-  r.innerHTML = `<input type="text" placeholder="field name" /><select><option>string</option><option>number</option><option>url</option><option>date</option><option>boolean</option><option>array</option></select><button class="btn-del" onclick="delField(this)"><i class="ti ti-x"></i></button>`;
+  const r = document.createElement('div'); r.className = 'field-row';
+  r.innerHTML = `<input type="text" placeholder="field name"/><select><option>string</option><option>number</option><option>url</option><option>date</option><option>boolean</option><option>array</option></select><button class="btn-del" onclick="this.closest('.field-row').remove()"><i class="fa-solid fa-xmark"></i></button>`;
   document.getElementById('fields-list').appendChild(r);
 }
-function delField(btn) { btn.closest('.field-row').remove(); }
-
 function getSchema() {
-  return [...document.querySelectorAll('.field-row')].reduce((acc,r)=>{
-    const n = r.querySelector('input').value.trim();
-    const t = r.querySelector('select').value;
-    if(n) acc.push({name:n, type:t});
-    return acc;
+  return [...document.querySelectorAll('.field-row')].reduce((a,r)=>{
+    const n=r.querySelector('input').value.trim(), t=r.querySelector('select').value;
+    if(n) a.push({name:n,type:t}); return a;
   },[]);
 }
 
-// ─── MODE ─────────────────────────────────────────────────
+// ── MODE ───────────────────────────────────────────────
 function pickMode(el) {
-  document.querySelectorAll('.mode-card').forEach(c=>c.classList.remove('sel'));
-  el.classList.add('sel');
-  mode = el.dataset.mode;
+  document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active'); mode = el.dataset.mode;
 }
 
-// ─── TABS ─────────────────────────────────────────────────
+// ── TABS ───────────────────────────────────────────────
 function switchTab(tab) {
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('act'));
-  document.querySelector(`[data-tab="${tab}"]`).classList.add('act');
-  document.querySelectorAll('.content-pane').forEach(p=>p.classList.remove('act'));
-  document.getElementById(`pane-${tab}`).classList.add('act');
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+  ['results','log','deploy'].forEach(t => {
+    document.getElementById(`pane-${t}`).style.display = t===tab?'block':'none';
+  });
 }
 
-// ─── LOG ──────────────────────────────────────────────────
+// ── LOG ────────────────────────────────────────────────
 function log(msg, lv='info') {
-  const pane = document.getElementById('log-pane');
-  const empty = pane.querySelector('[style*="text-align:center"]');
+  const w = document.getElementById('log-wrap');
+  const empty = w.querySelector('[style*="text-align:center"]');
   if(empty) empty.remove();
   const d = new Date();
   const t = [d.getHours(),d.getMinutes(),d.getSeconds()].map(n=>String(n).padStart(2,'0')).join(':');
-  const line = document.createElement('div');
-  line.className = 'log-line';
-  line.innerHTML = `<span class="log-t">${t}</span><span class="log-lv lv-${lv}">${lv.toUpperCase()}</span><span class="log-m">${msg}</span>`;
-  pane.appendChild(line);
-  pane.scrollTop = pane.scrollHeight;
+  const el = document.createElement('div'); el.className = 'log-line';
+  el.innerHTML = `<span class="log-time">${t}</span><span class="log-lv lv-${lv}">${lv.toUpperCase()}</span><span class="log-msg">${msg}</span>`;
+  w.appendChild(el); w.scrollTop = w.scrollHeight;
 }
 function clearLog() {
-  document.getElementById('log-pane').innerHTML = '<div style="color:var(--tx3);text-align:center;padding:20px;">cleared</div>';
+  document.getElementById('log-wrap').innerHTML = '<div style="color:var(--muted);text-align:center;padding:30px;font-size:12px;">Cleared</div>';
 }
 
-// ─── PROGRESS ─────────────────────────────────────────────
-function setProgress(pct) {
-  const w = document.getElementById('prog-wrap');
-  w.style.display = pct > 0 ? 'block' : 'none';
-  document.getElementById('prog-fill').style.width = pct + '%';
+// ── PROGRESS ───────────────────────────────────────────
+function setProgress(p) {
+  document.getElementById('prog-wrap').style.display = p>0?'block':'none';
+  document.getElementById('prog-fill').style.width = p+'%';
 }
 
-// ─── FORMAT TOGGLE ─────────────────────────────────────────
-function setFmt(f, btn) {
-  fmt = f;
-  document.querySelectorAll('.fmt-btn').forEach(b=>b.classList.remove('act'));
-  btn.classList.add('act');
-  renderData();
-}
-
-
-
-// ─── MAIN RUN ─────────────────────────────────────────────
+// ── RUN ────────────────────────────────────────────────
 async function runScrape() {
-  const apiKey     = "";
-  const backendUrl = document.getElementById('backend-url').value.trim();
+  const backendUrl = BACKEND_URL;
   const targetUrl  = document.getElementById('target-url').value.trim();
   const instr      = document.getElementById('instructions').value.trim();
   const maxItems   = parseInt(document.getElementById('max-items').value);
 
-  if(!backendUrl) { log('Backend URL is required — add your Render URL to index.html','err'); switchTab('log'); return; }
-  if(!targetUrl)  { log('Target URL is required.','err'); switchTab('log'); return; }
+  if(!backendUrl) { log('Backend URL missing!','err'); switchTab('log'); return; }
+  if(!targetUrl)  { log('Target URL missing!','err'); switchTab('log'); return; }
 
   const btn = document.getElementById('run-btn');
   btn.disabled = true;
-  btn.innerHTML = '<span class="spin"></span> extracting...';
-  setProgress(10);
+  btn.innerHTML = '<span class="spinner"></span> Extracting...';
+  setProgress(15);
 
-  jobStart = Date.now();
-  log(`Starting scrape job — ${targetUrl}`, 'info');
-  log(`Mode: ${mode} | Max: ${maxItems} | Schema: ${getSchema().map(f=>f.name).join(', ')||'auto'}`, 'info');
-
-  const body = {
-    url: targetUrl,
-    schema: getSchema(),
-    mode,
-    instructions: instr,
-    maxItems,
-  };
-  if(apiKey) body.apiKey = apiKey;
-
-  setProgress(35);
-  log('Sending request to Netlify function...', 'info');
+  const start = Date.now();
+  log(`Starting scrape → ${targetUrl}`, 'info');
+  log(`Mode: ${mode} | Max records: ${maxItems}`, 'info');
 
   try {
+    setProgress(40);
     const res = await fetch(backendUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ targetUrl, schema:getSchema(), mode, instructions:instr, maxItems }),
     });
-
     setProgress(75);
-
     const json = await res.json();
-    if(!res.ok || !json.success) {
-      throw new Error(json.error || `HTTP ${res.status}`);
-    }
+    if(!res.ok || !json.success) throw new Error(json.error || `HTTP ${res.status}`);
 
     data = json.records || [];
     jobMeta = json.meta || {};
     rawOut = JSON.stringify(data, null, 2);
 
-    const elapsed = ((Date.now() - jobStart) / 1000).toFixed(1);
-    log(`Extracted ${data.length} records in ${elapsed}s`, 'ok');
-    if(jobMeta.model) log(`Grok model: ${jobMeta.model}`, 'info');
-    if(jobMeta.tokens) log(`Tokens — in: ${jobMeta.tokens.input}, out: ${jobMeta.tokens.output}`, 'info');
-    if(!jobMeta.pageFetched) log(`Page fetch warning: ${jobMeta.fetchError}`, 'warn');
+    const elapsed = ((Date.now()-start)/1000).toFixed(1);
+    log(`✓ Extracted ${data.length} records in ${elapsed}s`, 'ok');
+    if(jobMeta.model) log(`Model: ${jobMeta.model}`, 'info');
+    if(jobMeta.tokens) log(`Tokens → input: ${jobMeta.tokens.input}, output: ${jobMeta.tokens.output}`, 'info');
+    if(!jobMeta.pageFetched) log(`Warning: ${jobMeta.fetchError}`, 'warn');
 
     setProgress(100);
     updateStats(elapsed);
@@ -943,108 +724,92 @@ async function runScrape() {
     switchTab('results');
 
     const b = document.getElementById('badge-results');
-    b.textContent = data.length;
-    b.classList.add('show');
-
+    b.textContent = data.length; b.classList.add('show');
     setTimeout(()=>setProgress(0), 1500);
 
-  } catch(err) {
-    log(`Error: ${err.message}`, 'err');
-    setProgress(0);
-    switchTab('log');
+  } catch(e) {
+    log(`Error: ${e.message}`, 'err');
+    setProgress(0); switchTab('log');
   } finally {
     btn.disabled = false;
-    btn.innerHTML = '<i class="ti ti-player-play"></i> run scraper';
+    btn.innerHTML = '<i class="fa-solid fa-play"></i> Run Scraper';
   }
 }
 
-// ─── UPDATE STATS ─────────────────────────────────────────
+// ── STATS ──────────────────────────────────────────────
 function updateStats(elapsed) {
   if(!data.length) return;
   const keys = [...new Set(data.flatMap(r=>Object.keys(r)))];
-  let filled = 0, total = 0;
-  data.forEach(r => keys.forEach(k => { total++; if(r[k]!==null&&r[k]!==undefined&&r[k]!=='') filled++; }));
+  let filled=0, total=0;
+  data.forEach(r=>keys.forEach(k=>{total++;if(r[k]!==null&&r[k]!==undefined&&r[k]!=='')filled++;}));
   const qual = Math.round((filled/total)*100);
-
-  document.getElementById('s-rec').textContent  = data.length;
-  document.getElementById('s-fld').textContent  = keys.length;
-  document.getElementById('s-time').textContent = elapsed + 's';
-  document.getElementById('s-qual').textContent = qual + '%';
-  document.getElementById('res-count').textContent = `${data.length} records · ${keys.length} fields`;
-
-  document.getElementById('side-model').textContent  = jobMeta.model || 'grok-3-mini';
-  document.getElementById('side-tokens').textContent = jobMeta.tokens
-    ? `in: ${jobMeta.tokens.input} / out: ${jobMeta.tokens.output}`
-    : '—';
-
-  // Coverage bars
-  const covEl = document.getElementById('side-cov');
-  covEl.innerHTML = keys.map(k => {
-    const f = data.filter(r=>r[k]!==null&&r[k]!==undefined&&r[k]!=='').length;
-    const p = Math.round((f/data.length)*100);
-    const c = p>80?'var(--gr)':p>40?'var(--ye)':'var(--re)';
-    return `<div class="cov-item"><div class="cov-head"><span>${k}</span><span style="color:${c}">${p}%</span></div><div class="cov-bg"><div class="cov-fill" style="width:${p}%;background:${c};"></div></div></div>`;
-  }).join('');
+  document.getElementById('s-rec').textContent = data.length;
+  document.getElementById('s-fld').textContent = keys.length;
+  document.getElementById('s-time').textContent = elapsed+'s';
+  document.getElementById('s-qual').textContent = qual+'%';
+  document.getElementById('res-info').textContent = `${data.length} records · ${keys.length} fields`;
+  document.getElementById('stats-row').style.display = 'block';
 }
 
-// ─── RENDER DATA ──────────────────────────────────────────
-function renderData() {
-  const el = document.getElementById('res-scroll');
-  if(!data.length) { el.innerHTML = '<div class="empty"><i class="ti ti-database-off"></i><div class="empty-t">no data</div></div>'; return; }
+// ── RENDER DATA ────────────────────────────────────────
+function setFmt(f, btn) {
+  fmt=f;
+  document.querySelectorAll('.fmt-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active'); renderData();
+}
 
-  if(fmt === 'table') {
-    const keys = [...new Set(data.flatMap(r=>Object.keys(r)))];
-    const rows = data.map(r =>
-      `<tr>${keys.map(k=>{
-        let v = r[k];
-        if(v===null||v===undefined) return `<td class="is-null">null</td>`;
-        if(Array.isArray(v)) v = v.join(', ');
-        if(typeof v==='object') v = JSON.stringify(v);
-        const s = String(v);
-        if(s.startsWith('http')) return `<td class="is-url"><a href="${s}" target="_blank" rel="noopener">${s.length>45?s.slice(0,45)+'…':s}</a></td>`;
-        if(typeof r[k]==='number') return `<td class="is-num">${v}</td>`;
-        return `<td title="${s}">${s.length>70?s.slice(0,70)+'…':s}</td>`;
-      }).join('')}</tr>`
-    ).join('');
-    el.innerHTML = `<table class="data-table"><thead><tr>${keys.map(k=>`<th>${k}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table>`;
-  } else if(fmt === 'json') {
-    el.innerHTML = `<div class="json-view">${colorizeJson(JSON.stringify(data,null,2))}</div>`;
+function renderData() {
+  const el = document.getElementById('res-content');
+  if(!data.length) return;
+  if(fmt==='table') {
+    const keys=[...new Set(data.flatMap(r=>Object.keys(r)))];
+    const rows=data.map(r=>`<tr>${keys.map(k=>{
+      let v=r[k];
+      if(v===null||v===undefined) return `<td class="null">null</td>`;
+      if(Array.isArray(v)) v=v.join(', ');
+      if(typeof v==='object') v=JSON.stringify(v);
+      const s=String(v);
+      if(s.startsWith('http')) return `<td class="url"><a href="${s}" target="_blank">${s.length>45?s.slice(0,45)+'…':s}</a></td>`;
+      if(typeof r[k]==='number') return `<td class="num">${v}</td>`;
+      return `<td title="${s}">${s.length>70?s.slice(0,70)+'…':s}</td>`;
+    }).join('')}</tr>`).join('');
+    el.innerHTML=`<table class="data-table"><thead><tr>${keys.map(k=>`<th>${k}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table>`;
+  } else if(fmt==='json') {
+    el.innerHTML=`<div class="json-view">${colorize(JSON.stringify(data,null,2))}</div>`;
   } else {
-    el.innerHTML = `<div class="json-view">${esc(rawOut)}</div>`;
+    el.innerHTML=`<div class="json-view">${esc(rawOut)}</div>`;
   }
 }
 
-function colorizeJson(s) {
-  return esc(s).replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, m=>{
-    let cls = 'jn';
-    if(/^"/.test(m)) cls = /:$/.test(m)?'jk':'js';
-    else if(/true|false/.test(m)) cls='jb';
-    else if(/null/.test(m)) cls='jx';
-    return `<span class="${cls}">${m}</span>`;
+function colorize(s) {
+  return esc(s).replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,m=>{
+    let c='jn';
+    if(/^"/.test(m)) c=/:$/.test(m)?'jk':'js';
+    else if(/true|false/.test(m)) c='jb';
+    else if(/null/.test(m)) c='jx';
+    return `<span class="${c}">${m}</span>`;
   });
 }
-function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
-// ─── EXPORT ───────────────────────────────────────────────
+// ── EXPORT ─────────────────────────────────────────────
 function doExport(type) {
-  if(!data.length) { log('No data to export','warn'); return; }
-  let content, mime, ext;
-  if(type==='json') {
-    content = JSON.stringify(data, null, 2); mime='application/json'; ext='json';
-  } else {
-    const keys = [...new Set(data.flatMap(r=>Object.keys(r)))];
-    const rows = [keys.join(','), ...data.map(r=>keys.map(k=>{
-      let v = r[k]??'';
-      if(Array.isArray(v)) v=v.join(';');
-      if(typeof v==='object') v=JSON.stringify(v);
+  if(!data.length){log('No data to export','warn');return;}
+  let content,mime,ext;
+  if(type==='json'){content=JSON.stringify(data,null,2);mime='application/json';ext='json';}
+  else {
+    const keys=[...new Set(data.flatMap(r=>Object.keys(r)))];
+    const rows=[keys.join(','),...data.map(r=>keys.map(k=>{
+      let v=r[k]??'';
+      if(Array.isArray(v))v=v.join(';');
+      if(typeof v==='object')v=JSON.stringify(v);
       return `"${String(v).replace(/"/g,'""')}"`;
     }).join(','))];
-    content = rows.join('\n'); mime='text/csv'; ext='csv';
+    content=rows.join('\n');mime='text/csv';ext='csv';
   }
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([content],{type:mime}));
-  a.download = `scraped_${Date.now()}.${ext}`;
-  a.click();
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([content],{type:mime}));
+  a.download=`scraped_data_${Date.now()}.${ext}`;a.click();
   log(`Exported ${data.length} records as ${ext.toUpperCase()}`, 'ok');
 }
 </script>
