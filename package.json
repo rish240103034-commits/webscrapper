@@ -1,12 +1,15 @@
 {
-  "name": "grokscraper-backend",
-  "version": "1.0.0",
-  "description": "GrokScraper backend — Express-free Node.js server for Render",
+  "name": "advanced-web-scraper",
+  "version": "3.0.0",
+  "description": "Free web scraper — 7 extraction modules, pure Node.js, no API keys, GitHub Pages + Render",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "engines": {
     "node": ">=18.0.0"
-  }
+  },
+  "keywords": ["web-scraper", "nodejs", "no-api", "free", "render", "github-pages"],
+  "author": "",
+  "license": "MIT"
 }
